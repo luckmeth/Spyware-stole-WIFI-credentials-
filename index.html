@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Your Wi-Fi</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #080c24;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .main-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Background animations */
+        .bg-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(8,12,36,0.5) 0%, rgba(8,12,36,0.9) 70%);
+            z-index: 2;
+        }
+        
+        .network-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(18, 65, 145, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(18, 65, 145, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 1;
+        }
+        
+        .floating-particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(65, 137, 230, 0.3);
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translate(var(--x), var(--y)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .pulse-circle {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(65, 137, 230, 0.3);
+            animation: pulse 4s infinite ease-out;
+            z-index: 1;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(10);
+                opacity: 0;
+            }
+        }
+        
+        /* Content styles */
+        .content-container {
+            background: rgba(255, 255, 255, 0.95);
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 41, 107, 0.3);
+            animation: fadeIn 0.8s ease-out;
+            display: flex;
+            z-index: 10;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #004e92 0%, #000428 100%);
+            padding: 40px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/api/placeholder/400/320');
+            background-size: cover;
+            opacity: 0.1;
+            z-index: 1;
+        }
+        
+        .left-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        
+        .warning-icon {
+            font-size: 4rem;
+            color: #ff3d00;
+            margin-bottom: 20px;
+            animation: pulse-warning 2s infinite;
+        }
+        
+        @keyframes pulse-warning {
+            0% {
+                transform: scale(1);
+                text-shadow: 0 0 10px rgba(255, 61, 0, 0.5);
+            }
+            50% {
+                transform: scale(1.1);
+                text-shadow: 0 0 20px rgba(255, 61, 0, 0.8);
+            }
+            100% {
+                transform: scale(1);
+                text-shadow: 0 0 10px rgba(255, 61, 0, 0.5);
+            }
+        }
+        
+        .left-panel h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .left-panel p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        
+        .threat-list {
+            text-align: left;
+            margin: 30px 0;
+        }
+        
+        .threat-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            animation: slideIn 0.6s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .threat-icon {
+            margin-right: 15px;
+            color: #ff3d00;
+            font-size: 1.2rem;
+        }
+        
+        .speed-meter {
+            width: 100%;
+            margin: 40px 0;
+            text-align: center;
+        }
+        
+        .speed-bar {
+            height: 10px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .speed-fill {
+            position: absolute;
+            height: 100%;
+            width: 85%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            border-radius: 5px;
+            animation: speedPulse 2s infinite;
+        }
+        
+        @keyframes speedPulse {
+            0% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.8;
+            }
+        }
+        
+        .speed-label {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+        
+        .right-panel {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .right-panel h2 {
+            color: #004e92;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .benefits {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .benefit {
+            flex-basis: calc(50% - 10px);
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .benefit i {
+            color: #4CAF50;
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            color: #666;
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: #f9fbfd;
+        }
+        
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #004e92;
+            box-shadow: 0 0 0 2px rgba(0, 78, 146, 0.2);
+            outline: none;
+            background-color: #fff;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #004e92 0%, #000428 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 78, 146, 0.3);
+        }
+        
+        button:hover::after {
+            left: 100%;
+        }
+        
+        .logo-container {
+            position: absolute;
+            bottom: 20px;
+            text-align: center;
+            width: 100%;
+            left: 0;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 900px) {
+            .content-container {
+                flex-direction: column;
+                max-width: 600px;
+            }
+            
+            .left-panel, .right-panel {
+                padding: 30px;
+            }
+            
+            .left-panel h1 {
+                font-size: 2rem;
+            }
+            
+            .benefit {
+                flex-basis: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-wrapper">
+        <div class="network-grid"></div>
+        <div class="bg-overlay"></div>
+        <!-- Pulse circles will be added by JS -->
+        <!-- Floating particles will be added by JS -->
+    </div>
+    
+    <div class="main-container">
+        <div class="content-container">
+            <div class="left-panel">
+                <div class="left-content">
+                    <div class="warning-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h1>⚠️ Your Wi-Fi Is Not Secure!</h1>
+                    <p>Your current connection is vulnerable and can be easily accessed by hackers.</p>
+                    
+                    <div class="threat-list">
+                        <div class="threat-item">
+                            <div class="threat-icon"><i class="fas fa-user-secret"></i></div>
+                            <div>Vulnerable to man-in-the-middle attacks</div>
+                        </div>
+                        <div class="threat-item" style="animation-delay: 0.2s">
+                            <div class="threat-icon"><i class="fas fa-file-alt"></i></div>
+                            <div>Personal data can be intercepted</div>
+                        </div>
+                        <div class="threat-item" style="animation-delay: 0.4s">
+                            <div class="threat-icon"><i class="fas fa-laptop"></i></div>
+                            <div>Your devices are exposed to network threats</div>
+                        </div>
+                    </div>
+                    
+                    <div class="speed-meter">
+                        <div class="speed-label">300Mbps+</div>
+                        <div class="speed-bar">
+                            <div class="speed-fill"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="logo-container">
+                    Powered by 1.1.1.1 Advanced Security
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <h2>Secure Your Network Now</h2>
+                <p class="subtitle">Enter your Wi-Fi credentials to enable enhanced security</p>
+                
+                <div class="benefits">
+                    <div class="benefit">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Enhanced encryption</span>
+                    </div>
+                    <div class="benefit" style="animation-delay: 0.2s">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Boost speeds up to 300Mbps+</span>
+                    </div>
+                    <div class="benefit" style="animation-delay: 0.4s">
+                        <i class="fas fa-lock"></i>
+                        <span>Protection against intrusions</span>
+                    </div>
+                    <div class="benefit" style="animation-delay: 0.6s">
+                        <i class="fas fa-globe"></i>
+                        <span>Secure browsing everywhere</span>
+                    </div>
+                </div>
+                
+                <form action="/secure" method="POST">
+                    <div class="form-group">
+                        <label for="ssid">Network Name (SSID):</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-wifi"></i>
+                            <input type="text" id="ssid" name="ssid" placeholder="Enter your network name" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Wi-Fi Password:</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-key"></i>
+                            <input type="password" id="password" name="password" placeholder="Enter your current Wi-Fi password" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit">SECURE MY NETWORK NOW</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createFloatingParticles() {
+            const bgWrapper = document.querySelector('.bg-wrapper');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('floating-particle');
+                
+                // Random size
+                const size = Math.random() * 30 + 5;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                particle.style.left = `${left}%`;
+                particle.style.top = `${top}%`;
+                
+                // Random travel distance
+                const xTravel = (Math.random() * 400) - 200;
+                const yTravel = (Math.random() * 400) - 200;
+                particle.style.setProperty('--x', `${xTravel}px`);
+                particle.style.setProperty('--y', `${yTravel}px`);
+                
+                // Random animation delay
+                const delay = Math.random() * 15;
+                particle.style.animationDelay = `${delay}s`;
+                
+                bgWrapper.appendChild(particle);
+            }
+        }
+        
+        // Create pulse circles
+        function createPulseCircles() {
+            const bgWrapper = document.querySelector('.bg-wrapper');
+            for (let i = 0; i < 3; i++) {
+                const circle = document.createElement('div');
+                circle.classList.add('pulse-circle');
+                
+                // Position in center
+                circle.style.left = '50%';
+                circle.style.top = '50%';
+                circle.style.transform = 'translate(-50%, -50%)';
+                
+                // Random animation delay
+                const delay = Math.random() * 4;
+                circle.style.animationDelay = `${delay}s`;
+                
+                bgWrapper.appendChild(circle);
+            }
+        }
+        
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', function() {
+            createFloatingParticles();
+            createPulseCircles();
+            
+            // Animation delay for threat items
+            const threatItems = document.querySelectorAll('.threat-item');
+            threatItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.2}s`;
+            });
+            
+            // Animation delay for benefit items
+            const benefitItems = document.querySelectorAll('.benefit');
+            benefitItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.2}s`;
+            });
+        });
+    </script>
+</body>
+</html>

